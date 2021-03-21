@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+    <head>
+        <title>SAX</title>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.6.18/dist/css/uikit.min.css" />
+        <script src="https://cdn.jsdelivr.net/npm/uikit@3.6.18/dist/js/uikit.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/uikit@3.6.18/dist/js/uikit-icons.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    </head>
+
+    <body >
+        <div class="uk-margin-auto uk-margin-auto-vertical uk-text-center uk-position-center" >
+            <div class="uk-margin-auto uk-margin-auto-vertical uk-card uk-card-large uk-card-body">
+                <form class="uk-margin uk-margin-auto" action="">
+                    <fieldset class="uk-fieldset">
+                        <legend class="uk-legend">SAX</legend>
+                        <hr class="uk-divider-icon">
+                        <div class="uk-margin">
+                            <div class="uk-inline">
+                                <span class="uk-form-icon" uk-icon="icon: user"></span>
+                                <input id="name" class="uk-input uk-form-width-large" type="text" placeholder="YOUR ACCOUNT NAME" >
+                            </div>
+                        </div>
+                        <div class="uk-margin">
+                            <div class="uk-inline">
+                                <span class="uk-form-icon" uk-icon="icon: lock"></span>
+                                <input id="pass" class="uk-input uk-form-width-large" type="password" placeholder="YOUR PASSWORD" >
+                            </div>
+                        </div>
+                
+                        <div class="uk-margin uk-animation-toggle">
+                            <div class="uk-inline">
+                                <label class="uk-animation-shake"><input id="keep" class="uk-checkbox" type="checkbox">&nbsp;&nbsp;KEEP SIGN-IN FOR A LONG TIME</label>
+                            </div>
+                        </div>
+                        <div id="login-success" class="uk-margin uk-alert-success" hidden uk-alert>
+                            <a class="uk-alert-close" uk-close></a>
+                            <p>Sign success.</p>
+                        </div>
+                        <ul id="info">
+
+                        </ul>
+                        <div id="login-failure" class="uk-margin uk-alert-danger" hidden uk-alert>
+                            <a class="uk-alert-close" uk-close></a>
+                            <p>Sign failure.</p>
+                        </div>
+                        <div class="uk-margin">
+                            <div class="uk-inline">
+                                <button class="uk-button uk-form-width-large uk-button-primary" id="login" onclick="return false;">LOGIN</button>
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+    </body>
+
+    <script>
+        function check() {
+            $.ajax({
+                url: "/sax/user/check",
+                method: "POST",
+                contentType: "application/json",
+                success: function(result, status, xhr) {
+                    var resJson = xhr.responseJSON;
+                    if(resJson != null && resJson.data != null) {
+                        if(resJson.status == 200) {  // sign in
+                            window.location.href="/home.html";
+                            return;
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    UIkit.notification({message: 'Service not valid...'});
+                    return;
+                }
+            });
+        };
+        check();    // init
+
+        $("#login").click(function() {
+            var data = {
+                "name": $("#name").val().replace(/(^\s*)|(\s*$)/g, ""),
+                "pass": $("#pass").val().replace(/(^\s*)|(\s*$)/g, ""),
+                "keep": $("#keep").is(':checked')
+            };
+            console.log(data)
+            if(data.name.length == 0 || data.pass.length == 0) {
+                $("#info").empty();
+                var loginNot = $('<div class="uk-margin uk-alert-warning" uk-alert><a class="uk-alert-close" uk-close></a><p>Enter Bouth Your Account Name And Password.</p></div>');
+                $("#info").append(loginNot);
+                return;
+            }
+            $.ajax({
+                url: "/sax/user/auth",
+                method: "POST",
+                data: JSON.stringify(data),
+                dataType: "json",
+                contentType: "application/json",
+                success: function(result, status, xhr) {
+                    var resJson = xhr.responseJSON;
+                    if(resJson != null && resJson.data != null) {
+                        if(resJson.data.status == 0) {  // success
+                            var loginSuccess = $('<div class="uk-margin uk-alert-success" uk-alert><a class="uk-alert-close" uk-close></a><p> Sign ' + resJson.data.info + ', Welcome Home.</p></div>');
+                            $("#info").empty();
+                            $("#info").append(loginSuccess);
+                            setTimeout(function(){
+                                window.location.href="/home.html";
+                            }, 2000);
+                            return;
+                        }
+                        var msg = "";
+                        if(resJson.data.status == 1         // user not exist
+                            || resJson.data.status == 2) {  // password is wrong
+                            msg = resJson.data.info;
+                        }
+                        var loginFailure = $('<div class="uk-margin uk-alert-danger" uk-alert><a class="uk-alert-close" uk-close></a><p>' + msg + '</p></div>');
+                        $("#info").empty();
+                        $("#info").append(loginFailure);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    var resJson = xhr.responseJSON;
+                    var msg = resJson != null && resJson.msg != '' ? resJson.msg : "Bad Request";
+                    var loginFailure = $('<div class="uk-margin uk-alert-danger" uk-alert><a class="uk-alert-close" uk-close></a><p>' + msg + '</p></div>');
+                    $("#info").empty();
+                    $("#info").append(loginFailure);
+                },
+                complete: function(xhr, status) {
+                    // 
+                }
+            });
+        });
+    </script>
+</html>

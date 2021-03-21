@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+    <head>
+        <title>SAX SAHRE</title>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.6.18/dist/css/uikit.min.css" />
+        <script src="https://cdn.jsdelivr.net/npm/uikit@3.6.18/dist/js/uikit.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/uikit@3.6.18/dist/js/uikit-icons.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    </head>
+
+    <body >
+        <div class="uk-margin-auto uk-margin-auto-vertical uk-text-center uk-position-center" >
+            <div class="uk-margin-auto uk-margin-auto-vertical uk-card uk-card-default uk-card-body">
+                <fieldset class="uk-fieldset">
+                    <legend class="uk-legend">SAX</legend>
+                    <hr class="uk-divider-icon">
+                    <div class="uk-margin">
+                        <article class="uk-comment">
+                            <header class="uk-comment-header">
+                                <div class="uk-grid-medium uk-flex-middle" uk-grid>
+                                    <div class="uk-width-auto">
+                                        <img class="uk-comment-avatar" src="res/avator-azenga.jpg" width="80" height="80" alt="">
+                                    </div>
+                                    <div class="uk-width-expand">
+                                        <h1 class="uk-comment-title uk-margin-remove uk-heading-line uk-text-center"><span>ZENG ZHENG YI</span></h1>
+                                        <br/>
+                                        <ul class="uk-comment-meta uk-subnav uk-subnav-divider uk-margin-remove-top">
+                                            <li id="sax-share-date"></li>
+                                            <li>SHARE FILE TO YOU.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </header>
+                            <div class="uk-comment-body">
+                                <div  class="uk-margin">
+                                    <div class="uk-inline">
+                                        <a class="uk-form-icon" style="left: -39px; top: 3px;" href="#" uk-icon="icon: download"></a>
+                                        <a  id="sax-share-link" class="uk-button-text" target="_blank" >FILE NAME</a>
+                                    </div>
+                                </div>
+                                <hr class="uk-margin-small">
+                                <p>
+                                    <ul uk-accordion>
+                                        <li class="uk-open">
+                                            <a class="uk-accordion-title" href="#">I TELL YOU: </a>
+                                            <div class="uk-accordion-content">
+                                                <p id="sax-share-remark"></p>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </p>
+                            </div>
+                        </article>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </body>
+
+    <script>
+        Date.prototype.Format = function (fmt) {
+            var o = {
+                "M+": this.getMonth() + 1,
+                "d+": this.getDate(),
+                "h+": this.getHours(),
+                "m+": this.getMinutes(),
+                "s+": this.getSeconds(),
+                "q+": Math.floor((this.getMonth() + 3) / 3),
+                "S": this.getMilliseconds()
+            };
+            if (/(y+)/.test(fmt))
+                fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+            for (var k in o)
+                if (new RegExp("(" + k + ")").test(fmt))
+                    fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+            return fmt;
+        };
+
+        (function ($) {
+            $.getUrlParam = function (name) {
+                var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+                var r = window.location.search.substr(1).match(reg);
+                if (r != null) return unescape(r[2]); return null;
+            }
+        })(jQuery);
+
+        console.log($.getUrlParam("smd5"));
+        $.ajax({
+            url: "/sax/file/info/" + $.getUrlParam("smd5"),
+            method: "GET",
+            contentType: "application/json",
+            success: function(result, status, xhr) {
+                console.log(result);
+                if(result.status == 200) {
+                    if(result.data != null) {
+                        if(result.data.status == 0) {
+                            $("#sax-share-link").attr("href", result.data.fetch);
+                            $("#sax-share-link").text(result.data.fetch);
+                            $("#sax-share-date").text(new Date(result.data.timestamp).Format('yyyy-MM-dd'));
+                            $("#sax-share-remark").text(result.data.remark);
+                        } else {    // file not exist
+                            
+                        }
+                    }
+                }
+            },
+            error: function(xhr, status) {
+
+            }
+        });
+    </script>
+</html>

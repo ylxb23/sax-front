@@ -1,0 +1,15 @@
+<svg width="88" height="77" xmlns="http://www.w3.org/2000/svg">
+ <!-- Created with Method Draw - http://github.com/duopixel/Method-Draw/ -->
+ <g>
+  <title>background</title>
+  <rect fill="none" id="canvas_background" height="79" width="90" y="-1" x="-1"/>
+  <g display="none" overflow="visible" y="0" x="0" height="100%" width="100%" id="canvasGrid">
+   <rect fill="url(#gridpattern)" stroke-width="0" y="0" x="0" height="100%" width="100%"/>
+  </g>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <text font-style="normal" font-weight="normal" xml:space="preserve" text-anchor="start" font-family="'Courier New', Courier, monospace" font-size="24" id="svg_1" y="40" x="21.5" stroke-width="0" stroke="#000" fill="#000000">SAX</text>
+  <path id="svg_4" d="m81.083501,40.106487l-9.850659,-8.661034l0,-20.685219l-8.444801,0l0,13.260264l-19.704535,-17.324896l-37.999995,33.410885l9.046392,-0.189514l0,33.778598l57.505072,0l0,-33.589084l9.448526,0zm-37.999995,28.757913l-18.765152,0l0,-19.799881l18.765152,0l0,19.799881zm18.231118,-8.485664l-12.331017,0l0,-11.433017l12.331017,0l0,11.433017z" fill-opacity="null" stroke-opacity="null" stroke="#000" fill="none"/>
+ </g>
+</svg>

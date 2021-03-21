@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+    <head>
+        <title>SAX HOME</title>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.6.18/dist/css/uikit.min.css" />
+        <script src="https://cdn.jsdelivr.net/npm/uikit@3.6.18/dist/js/uikit.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/uikit@3.6.18/dist/js/uikit-icons.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    </head>
+
+    <body >
+        <div>
+            <div uk-sticky="media: 960" class="uk-sticky uk-sticky-below uk-sticky-fixed" style="position: fixed; top: 20px; width: 100%;">
+                <div class="uk-navbar-left">
+                    <ul class="uk-navbar-nav uk-visible@m">
+                        <li class="">
+                            <a href="#" class="uk-button uk-button-text sax-usr"></a>
+                        </li>
+                    </ul> 
+                </div>
+                <div class="uk-navbar-right">
+                    <ul class="uk-navbar-nav uk-visible@m  uk-position-right" style="right: 66px;">
+                        <li class="">
+                            <a href="#" class="uk-button uk-button-text" onclick="logout();">SIGN-OUT</a>
+                        </li>
+                    </ul> 
+                </div>
+            </div>
+            <h1 class="uk-heading-divider uk-heading-bullet">&nbsp;&nbsp;&nbsp;&nbsp;Welcome Home</h1>
+            <div class="uk-margin uk-margin-auto uk-position-relative uk-margin-medium" style="width: 90%;" >
+                <ul class="uk-tab" uk-tab>
+                    <li class="uk-active"><a href="#">MY FILE LIST</a></li>
+                    <li class=""><a href="#">UPLOAD FILE</a></li>
+                </ul>
+                <ul class="uk-switcher uk-margin">
+                    <!-- my file list tab -->
+                    <li id="minelist" class="">
+                        <div class="uk-margin uk-margin-auto">
+                            <form action="" class="uk-grid-small" uk-grid>
+                                <div class="uk-width-1-4@s">
+                                    <input id="from" class="uk-input" type="date" placeholder="START TIME">
+                                </div>
+                                <div class="uk-width-1-4@s">
+                                    <input id="to" class="uk-input" type="date" placeholder="END TIME">
+                                </div>
+                                <div class="uk-width-1-4@s">
+                                    <input id="keys" class="uk-input" type="text" placeholder="File Name (Not support yet)" disabled>
+                                </div>
+                                <div class="uk-width-1-4@s">
+                                    <button id="search" class="uk-button uk-button-primary" onclick="return false;" >SEARCH</button>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- file list -->
+                        <div id="minelistresult" class="">
+                            <table class="uk-table uk-table-divider uk-table-striped">
+                                <thead>
+                                    <tr>
+                                        <th class="uk-width-small">No.</th>
+                                        <th>FILE NAME</th>
+                                        <th>ALIAS</th>
+                                        <th>SIZE</th>
+                                        <th>UPLOAD TIME</th>
+                                        <th>SHARE INFO</th>
+                                        <th>OPERATE</th>
+                                        <th>REAMRK</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="resultset">
+                                    <!-- fill after search -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <ul>
+                            <!-- share file dialog modal -->
+                            <div id="sax-modal-share" uk-modal>
+                                <div class="uk-modal-dialog">
+                                    <button class="uk-modal-close-default" type="button" uk-close></button>
+                                    <div class="uk-modal-header">
+                                        <h2 class="uk-modal-title">FILE SHARE</h2>
+                                    </div>
+                                    <div class="uk-modal-body">
+                                        <div class="uk-margin uk-margin-auto">
+                                            <form >
+                                                <div class="uk-margin">
+                                                    <div class="uk-inline">
+                                                        File：
+                                                        <input id="sax-share-name" class="uk-input uk-form-width-large" type="text" disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="uk-margin" hidden>
+                                                    <div class="uk-inline">
+                                                        MD5：
+                                                        <input id="sax-share-md5" class="uk-input uk-form-width-large" type="text" disabled hidden>
+                                                    </div>
+                                                </div>
+                                                <div class="uk-margin">
+                                                    <div class="uk-inline">
+                                                        Effective deadline：
+                                                        <input id="sax-share-limit" class="uk-input uk-form-width-large" type="date">
+                                                    </div>
+                                                </div>
+                                            
+                                                <div class="uk-margin">
+                                                    <textarea id="sax-share-remark" class="uk-textarea" rows="5" placeholder="REAMRK"></textarea>
+                                                    <a class="uk-form-icon" href="#" uk-icon="icon: tag"></a>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div class="uk-modal-footer uk-text-right">
+                                        <button class="uk-button uk-button-default uk-modal-close" type="button">CANCEL</button>
+                                        <button class="uk-button uk-button-primary" type="button">SHARE</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </ul>
+                        <!-- page list -->
+                        <!-- 
+                        <ul class="uk-pagination" uk-margin>
+                            <li><a href="#"><span uk-pagination-previous></span></a></li>
+                            <li><a href="#">1</a></li>
+                            <li class="uk-disabled"><span>...</span></li>
+                            <li><a href="#">4</a></li>
+                            <li><a href="#">5</a></li>
+                            <li><a href="#">6</a></li>
+                            <li><a href="#">7</a></li>
+                            <li><a href="#"><span uk-pagination-next></span></a></li>
+                        </ul> 
+                        -->
+
+                    </li>
+                    <!-- upload file tab -->
+                    <li id="sax-upload-form" class="">
+                        <div class="uk-margin uk-margin-auto">
+                            <form action="">
+                                <div class="uk-margin">
+                                    <div class="uk-inline">
+                                        <a class="uk-form-icon" href="#" uk-icon="icon: pencil"></a>
+                                        <input id="sax-upload-alias" class="uk-input uk-form-width-large" type="text" placeholder="ALIAS">
+                                    </div>
+                                </div>
+                            
+                                <div class="uk-margin">
+                                    <textarea id="sax-upload-remark" class="uk-textarea" rows="5" placeholder="REAMRK"></textarea>
+                                    <a class="uk-form-icon" href="#" uk-icon="icon: tag"></a>
+                                </div>
+                            
+                                <div class="uk-margin" uk-margin>
+                                    <div uk-form-custom="target: true">
+                                        <a class="uk-form-icon" href="#" uk-icon="icon: folder"></a>
+                                        <input id="sax-upload-file" type="file" >
+                                        <input class="uk-input uk-form-width-large" type="text" placeholder="SELECT FILE..." disabled>
+                                    </div>
+                                    <button id="sax-upload-submit" class="uk-button uk-button-primary" onclick="return false;">UPLOAD FILE</button>
+                                </div>
+                            
+                            </form>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </body>
+
+    <script>
+        Date.prototype.Format = function (fmt) {
+            var o = {
+                "M+": this.getMonth() + 1,
+                "d+": this.getDate(),
+                "h+": this.getHours(),
+                "m+": this.getMinutes(),
+                "s+": this.getSeconds(),
+                "q+": Math.floor((this.getMonth() + 3) / 3),
+                "S": this.getMilliseconds()
+            };
+            if (/(y+)/.test(fmt))
+                fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+            for (var k in o)
+                if (new RegExp("(" + k + ")").test(fmt))
+                    fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+            return fmt;
+        };
+        
+
+        var user;
+        // init for user
+        $(function() {
+            // check is sign
+            check();
+            // load cookies for user
+            user = {
+                name: $.cookie("usr"),
+                sn: $.cookie("sn"),
+                ttl: $.cookie("aut")
+            };
+            // fill user name
+            $(".sax-usr").text(user.name);
+            // init search form
+            var currentFormated = new Date().Format("yyyy-MM-dd");
+            $("#from").attr("min", "2021-03-01")
+            $("#from").attr("max", currentFormated);
+            $("#from").attr("value", new Date(new Date().getTime() - 3600*1000*24*7).Format('yyyy-MM-dd'));
+            
+            $("#to").attr("min", "2021-03-01")
+            $("#to").attr("max", currentFormated);
+            $("#to").attr("value", currentFormated);
+
+            // query
+            query();    
+        }); 
+
+        function fillShareDialog(name, md5) {
+            $("#sax-share-name").attr("value", name);
+            $("#sax-share-md5").attr("value", md5);
+        }
+        function refreshResultSetEvents() {
+            var currentFormated = new Date().Format("yyyy-MM-dd");
+            $(".sax-share-limit").attr("min", currentFormated);
+            $(".sax-share-limit").attr("value", new Date(new Date().getTime() + 3600*1000*24*30).Format('yyyy-MM-dd'));
+
+            $(".sax-share-submit").click(share); 
+        }
+
+        function share(_this) {
+            var _$ = $(_this.target);
+                console.log(_$);
+                console.log(_$.attr("refer"));
+                var currentItemId = "#"+_$.attr("refer");
+                var shareData = {
+                    md5: $(currentItemId).find("input.sax-share-md5").val(),
+                    limit:  $(currentItemId).find("input.sax-share-limit").val(),
+                    remark:  $(currentItemId).find("textarea.sax-share-remark").val()
+                };
+                console.log(shareData);
+                $.ajax({
+                    url: "/sax/file/share",
+                    method: "POST",
+                    data: JSON.stringify(shareData),
+                    dataType: "json",
+                    contentType: "application/json",
+                    success: function(result, status, xhr) {
+                        var resJson = xhr.responseJSON;
+                        console.log(resJson);
+                        if(resJson != null) {
+                            if(resJson.status == 200) {  // not login
+                                UIkit.notification({status: 'success', message: 'Share success...'});
+                                $(currentItemId).find("button.uk-modal-close").click();
+                                return;
+                            } else {
+                                UIkit.notification({status: 'warning', message: 'Share failure, reason:' + resJson.msg + '...'});
+                                return;
+                            }
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // UIkit.notification({status: 'danger', message: 'Service not valid...'});
+                        return;
+                    }, 
+                    complete: function() {
+                    }
+                });
+        }
+
+        function check() {
+            $.ajax({
+                url: "/sax/user/check",
+                method: "POST",
+                contentType: "application/json",
+                success: function(result, status, xhr) {
+                    var resJson = xhr.responseJSON;
+                    if(resJson != null) {
+                        if(resJson.status == 403) {  // not login
+                            UIkit.notification({message: 'Not login, redirct to sign page...'});
+                            window.location.href="/";
+                            return;
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    UIkit.notification({message: 'Service not valid, redirct to sign page...'});
+                    window.location.href="/";
+                    return;
+                }
+            });
+        }
+
+
+        function query() {
+            var data = {
+                from: $("#from").val(),
+                to: $("#to").val(),
+                keys: $("#keys").val(),
+                offset: 0,
+                limit: 100
+            };
+            console.log(data);
+            $.ajax({
+                url: "/sax/file/query?from=" + data.from + "&to=" + data.to + "&offset=" + data.offset + "&limit=" + data.limit,
+                method: "GET",
+                contentType: "application/json; charset=UTF-8",
+                success: function(result, status, xhr) {
+                    var resJson = xhr.responseJSON;
+                    console.log(resJson);
+
+                    if(resJson != null) {
+                        if(resJson.data != null) {
+                            fillQueryResult($("#resultset"), resJson.data);
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    UIkit.notification({message: 'Service not valid, redirct to sign page...'});
+                }, 
+                complete: function() {
+                    refreshResultSetEvents();
+                }
+            });
+        }
+        $("#search").click(function() {
+            query();
+        });
+
+/**
+
+                                    <tr>
+                                        <td>1</td>
+                                        <td>王小二的日志.pdf</td>
+                                        <td>王小二的碎碎念</td>
+                                        <td>2.35MB</td>
+                                        <td>2021-03-13</td>
+                                        <td>
+                                            <a class="uk-button uk-button-default" href="#modal-sections" uk-toggle>SHARE</a>
+                                        </td>
+                                        <td></td>
+                                        <td><button class="uk-button uk-button-default" type="button">Button</button></td>
+                                    </tr>
+*/
+
+        function fillQueryResult(_$, list) {
+            _$.empty();    // 清空
+
+            for(var i=0; i<list.length; i++) {
+                var current = list[i];
+                var shareT = '';
+                if(current.share == null) {
+                    shareT = '<button class="uk-button uk-button-primary uk-margin-small-right sax-share-pop" type="button" uk-toggle="target: #sax-modal-share-' + i +'">SHARE</button>';
+                    shareT += '<div id="sax-modal-share-' + i +'" uk-modal>'
+                                        +'<div class="uk-modal-dialog">'
+                                            +'<button class="uk-modal-close-default" type="button" uk-close></button>'
+                                            +'<div class="uk-modal-header">'
+                                                +'<h2 class="uk-modal-title">FILE SHARE</h2>'
+                                            +'</div>'
+                                            +'<div class="uk-modal-body">'
+                                                +'<div class="uk-margin uk-margin-auto">'
+                                                    +'<form >'
+                                                        +'<div class="uk-margin">'
+                                                            +'<div class="uk-inline">'
+                                                                +'File：'
+                                                                +'<input class="sax-share-name uk-input uk-form-width-large" type="text" value="' + current.name + '" disabled>'
+                                                            +'</div>'
+                                                        +'</div>'
+                                                        +'<div class="uk-margin" hidden>'
+                                                            +'<div class="uk-inline">'
+                                                                +'MD5：'
+                                                                +'<input class="sax-share-md5 uk-input uk-form-width-large" type="text" value="' + current.md5 + '" disabled>'
+                                                            +'</div>'
+                                                        +'</div>'
+                                                        +'<div class="uk-margin">'
+                                                            +'<div class="uk-inline">'
+                                                                +'Effective deadline：'
+                                                                +'<input class="sax-share-limit uk-input uk-form-width-large" type="date">'
+                                                            +'</div>'
+                                                        +'</div>'
+                                                        +'<div class="uk-margin">'
+                                                            +'<textarea class="sax-share-remark uk-textarea" rows="5" placeholder="REAMRK"></textarea>'
+                                                            +'<a class="uk-form-icon" href="#" uk-icon="icon: tag"></a>'
+                                                        +'</div>'
+                                                    +'</form>'
+                                                +'</div>'
+                                            +'</div>'
+                                            +'<div class="uk-modal-footer uk-text-right">'
+                                                +'<button class="uk-button uk-button-default uk-modal-close" type="button">CANCEL</button> &nbsp;&nbsp;'
+                                                +'<button class="sax-share-submit uk-button uk-button-primary" type="button" refer="sax-modal-share-' + i + '" >SHARE</button>'
+                                            +'</div>'
+                                        +'</div>'
+                                    +'</div>';
+                } else {
+                    shareT += '<button class="uk-button uk-button-danger uk-margin-small-right" type="button" uk-toggle="target: #sax-modal-shareinfo-'+ i +'">SHARE INFO</button>';
+                    shareT += '<div id="sax-modal-shareinfo-' + i +'" uk-modal>'
+                                +'<div class="uk-modal-dialog uk-modal-body">'
+                                    +'<h2 class="uk-modal-title">SHARE INFO</h2>'
+                                        +'<p>SHARE PAGE LINK: </p><a class="uk-button-text" target="_blank" href="' + current.share.link + '">' + current.share.link + '</a>'
+                                        +'<p>SHARE LINK: </p><a class="uk-button-text" target="_blank" href="' + current.share.fetch + '">' + current.share.fetch + '</a>'
+                                        +'<p>SHARE TIME: </p>' + formatDate_yyyyMMddhhmmss(current.share.timestamp) + ''
+                                        +'<p class="uk-text-right">'
+                                            +'<button class="uk-button uk-button-default uk-modal-close" type="button">Cancel</button>'
+                                        +'</p>'
+                                +'</div>'
+                            +'</div>';
+                }
+                var item = '<tr>'
+                            + '<td>' + (i+1) +'</td>'
+                            + '<td>' + current.name +'</td>'
+                            + '<td>' + current.alia +'</td>'
+                            + '<td>' + formatFileSizeHuman(current.size) +'</td>'
+                            + '<td>' + formatDate_yyyyMMddhhmmss(current.timestamp) +'</td>'
+                            + '<td>' + shareT +'</td>'
+                            + '<td>' + '<a class="uk-button uk-button-text" href="' + current.path + '" target="_blank">Download</a>'
+                            //         + '&nbsp;&nbsp;<a href="#" class="uk-button uk-button-text" onclick="delete(' + current.md5 + ');">Delete</a>'
+                                +'</td>'
+                            + '<td>' + current.remark +'</td>'
+                            + '</tr>';
+
+                _$.append($(item));   // 追加元素
+            }
+        }
+
+        function formatFileSizeHuman(size) {
+            if(size < 1<<10) {
+                return size + 'B';
+            } else if(size < 1<<20) {
+                return (size / (1<<10)).toFixed(2) + 'KB';
+            } else if(size < 1<<30) {
+                return (size / (1<<20)).toFixed(2) + 'MB';
+            } else if(size < 1<<40) {
+                return (size / (1<<30)).toFixed(2) + 'GB';
+            } else {
+                return (size / (1<<40)).toFixed(2) + 'TB';
+            }
+        }
+        function formatDate_yyyyMMddhhmmss(timestamp) {
+            return new Date(timestamp).Format('yyyy-MM-dd hh:mm:ss');
+        }
+
+
+        $("#sax-upload-submit").click(upload);
+        function upload(_this) {
+            var fileForm = new FormData();
+            fileForm.append("file", $("#sax-upload-file").prop('files')[0]);
+            fileForm.append("alias", $("#sax-upload-alias").val());
+            fileForm.append("remark", $("#sax-upload-remark").val());
+            $.ajax({
+                url: "/sax/file/upload",
+                method: "POST",
+                data: fileForm, 
+                cache: false, 
+                processData: false,
+                contentType: false,
+                success: function(result, status, xhr) {
+                    var resJson = xhr.responseJSON;
+                    console.log(resJson);
+                    if(resJson != null && resJson.status == 200) {
+                        UIkit.notification({status: 'success', message: 'Upload success...'});
+                        setTimeout(function() {
+                            window.location.href="/home.html";
+                        }, 2000);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log(xhr)
+                }
+            });
+        }
+
+        function logout() {
+            $.ajax({
+                url: "/sax/user/out",
+                method: "POST",
+                contentType: "application/json",
+                success: function(result, status, xhr) {
+                    var resJson = xhr.responseJSON;
+
+                    $.cookie('usr', null);
+                    $.cookie('sn', null);
+                    $.cookie('aut', null);
+                    user = {};
+                    if(resJson != null) {
+                        UIkit.notification({status: 'success', message: 'Logout success, redirct to sign page...'});
+                        setTimeout(function() {
+                            window.location.href="/";
+                        }, 2000);
+                        return;
+                    }
+                },
+                error: function(xhr, status, error) {
+                    return;
+                }
+            });
+        }
+    </script>
+</html>
