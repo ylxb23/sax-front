@@ -252,7 +252,6 @@
                     contentType: "application/json",
                     success: function(result, status, xhr) {
                         var resJson = xhr.responseJSON;
-                        console.log(resJson);
                         if(resJson != null) {
                             if(resJson.status == 200) {  // not login
                                 UIkit.notification({status: 'success', message: 'Share success...'});
@@ -265,10 +264,14 @@
                         }
                     },
                     error: function(xhr, status, error) {
-                        UIkit.notification({status: 'danger', message: 'Please try again[' + xhr.error + ']'});
                         return;
                     }, 
                     complete: function() {
+                        UIkit.notification({status: 'success', message: 'Share success...'});
+                        $(currentItemId).find("button.uk-modal-close").click();
+                        setTimeout(function() {
+                            window.location.href="/home.html";
+                        }, 2000);
                     }
                 });
         }
