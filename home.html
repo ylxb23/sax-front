@@ -257,7 +257,7 @@
                                 UIkit.notification({status: 'success', message: 'Share success...'});
                                 $(currentItemId).find("button.uk-modal-close").click();
                                 setTimeout(function() {
-                                    window.location.href="/home.html";
+                                    query();
                                 }, 2000);
                                 return;
                             } else {
@@ -267,7 +267,7 @@
                         }
                     },
                     error: function(xhr, status, error) {
-                        UIkit.notification({status: 'warning', message: 'Share failure, reason:' + resJson.msg + '...'});
+                        UIkit.notification({status: 'warning', message: 'Share failure, reason:' + error + '...'});
                         return;
                     }, 
                     complete: function() {
