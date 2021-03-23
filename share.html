@@ -87,7 +87,6 @@
             }
         })(jQuery);
 
-        console.log($.getUrlParam("smd5"));
         $.ajax({
             url: "/sax/file/info/" + $.getUrlParam("smd5"),
             method: "GET",
@@ -102,13 +101,13 @@
                             $("#sax-share-date").text(new Date(result.data.timestamp).Format('yyyy-MM-dd'));
                             $("#sax-share-remark").text(result.data.remark);
                         } else {    // file not exist
-                            
+                            UIkit.notification({status: 'danger', message: 'Bad share link...'});
                         }
                     }
                 }
             },
             error: function(xhr, status) {
-
+                UIkit.notification({status: 'danger', message: 'Bad share link...'});
             }
         });
     </script>

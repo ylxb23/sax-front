@@ -157,6 +157,7 @@
                                         <input class="uk-input uk-form-width-large" type="text" placeholder="SELECT FILE..." disabled>
                                     </div>
                                     <button id="sax-upload-submit" class="uk-button uk-button-primary" onclick="return false;">UPLOAD FILE</button>
+                                    <ul id="sax-upload-spinner"></ul>
                                 </div>
                             
                             </form>
@@ -228,15 +229,21 @@
 
         function share(_this) {
             var _$ = $(_this.target);
-                console.log(_$);
-                console.log(_$.attr("refer"));
                 var currentItemId = "#"+_$.attr("refer");
                 var shareData = {
                     md5: $(currentItemId).find("input.sax-share-md5").val(),
                     limit:  $(currentItemId).find("input.sax-share-limit").val(),
                     remark:  $(currentItemId).find("textarea.sax-share-remark").val()
                 };
-                console.log(shareData);
+                if($(currentItemId).find("input.sax-share-md5").val() == null || $(currentItemId).find("input.sax-share-md5").val().length == 0) {
+                    UIkit.notification({status: 'warning', message: 'Share file info is empty, please refresh this page...'});
+                    return false;
+                }
+                if($(currentItemId).find("textarea.sax-share-remark").val() == null || $(currentItemId).find("textarea.sax-share-remark").val().length == 0) {
+                    UIkit.notification({status: 'warning', message: 'Remark cloud not be empty...'});
+                    return false;
+                }
+
                 $.ajax({
                     url: "/sax/file/share",
                     method: "POST",
@@ -258,7 +265,7 @@
                         }
                     },
                     error: function(xhr, status, error) {
-                        // UIkit.notification({status: 'danger', message: 'Service not valid...'});
+                        UIkit.notification({status: 'danger', message: 'Please try again[' + xhr.error + ']'});
                         return;
                     }, 
                     complete: function() {
@@ -440,10 +447,23 @@
 
         $("#sax-upload-submit").click(upload);
         function upload(_this) {
+            if($("#sax-upload-file").prop('files') == null || $("#sax-upload-file").prop('files').length == 0) {
+                UIkit.notification({status: 'warning', message: 'File cloud not be empty.'});
+                return false;
+            }
+            if($("#sax-upload-alias").val() == null || $("#sax-upload-alias").val().length == 0) {
+                UIkit.notification({status: 'warning', message: 'Alias cloud not be empty.'});
+                return false;
+            }
+            if($("#sax-upload-remark").val() == null || $("#sax-upload-remark").val().length == 0) {
+                UIkit.notification({status: 'warning', message: 'Remark cloud not be empty.'});
+                return false;
+            }
             var fileForm = new FormData();
             fileForm.append("file", $("#sax-upload-file").prop('files')[0]);
             fileForm.append("alias", $("#sax-upload-alias").val());
             fileForm.append("remark", $("#sax-upload-remark").val());
+
             $.ajax({
                 url: "/sax/file/upload",
                 method: "POST",
@@ -451,6 +471,10 @@
                 cache: false, 
                 processData: false,
                 contentType: false,
+                beforeSend: function() {
+                    $("#sax-upload-submit").attr("disabled");
+                    $("#sax-upload-spinner").append('<div uk-spinner></div>');
+                },
                 success: function(result, status, xhr) {
                     var resJson = xhr.responseJSON;
                     console.log(resJson);
@@ -462,7 +486,13 @@
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.log(xhr)
+                    UIkit.notification({status: 'danger', message: xhr.error});
+                }, 
+                complete: function() {
+                    setTimeout(function() {
+                        $("#sax-upload-spinner").empty();
+                        $("#sax-upload-submit").removeAttr("disabled");
+                    }, 1000);
                 }
             });
         }
