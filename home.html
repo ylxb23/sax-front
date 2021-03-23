@@ -256,6 +256,9 @@
                             if(resJson.status == 200) {  // not login
                                 UIkit.notification({status: 'success', message: 'Share success...'});
                                 $(currentItemId).find("button.uk-modal-close").click();
+                                setTimeout(function() {
+                                    window.location.href="/home.html";
+                                }, 2000);
                                 return;
                             } else {
                                 UIkit.notification({status: 'warning', message: 'Share failure, reason:' + resJson.msg + '...'});
@@ -264,14 +267,10 @@
                         }
                     },
                     error: function(xhr, status, error) {
+                        UIkit.notification({status: 'warning', message: 'Share failure, reason:' + resJson.msg + '...'});
                         return;
                     }, 
                     complete: function() {
-                        UIkit.notification({status: 'success', message: 'Share success...'});
-                        $(currentItemId).find("button.uk-modal-close").click();
-                        setTimeout(function() {
-                            window.location.href="/home.html";
-                        }, 2000);
                     }
                 });
         }
