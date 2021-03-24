@@ -507,9 +507,9 @@
                 success: function(result, status, xhr) {
                     var resJson = xhr.responseJSON;
 
-                    $.cookie('usr', null);
-                    $.cookie('sn', null);
-                    $.cookie('aut', null);
+                    $.cookie('usr', '', {expires: -1});
+                    $.cookie('sn', '', {expires: -1});
+                    $.cookie('aut', '', {expires: -1});
                     user = {};
                     if(resJson != null) {
                         UIkit.notification({status: 'success', message: 'Logout success, redirct to sign page...'});
