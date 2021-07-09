@@ -225,54 +225,92 @@
             $(".sax-share-limit").attr("value", new Date(new Date().getTime() + 3600*1000*24*30).Format('yyyy-MM-dd'));
 
             $(".sax-share-submit").click(share); 
+            $(".sax-delete-submit").click(deleteFile);
         }
 
-        function share(_this) {
+        function deleteFile(_this) {
             var _$ = $(_this.target);
-                var currentItemId = "#"+_$.attr("refer");
-                var shareData = {
-                    md5: $(currentItemId).find("input.sax-share-md5").val(),
-                    limit:  $(currentItemId).find("input.sax-share-limit").val(),
-                    remark:  $(currentItemId).find("textarea.sax-share-remark").val()
-                };
-                if($(currentItemId).find("input.sax-share-md5").val() == null || $(currentItemId).find("input.sax-share-md5").val().length == 0) {
-                    UIkit.notification({status: 'warning', message: 'Share file info is empty, please refresh this page...'});
-                    return false;
-                }
-                if($(currentItemId).find("textarea.sax-share-remark").val() == null || $(currentItemId).find("textarea.sax-share-remark").val().length == 0) {
-                    UIkit.notification({status: 'warning', message: 'Remark cloud not be empty...'});
-                    return false;
-                }
-
+            var currentItemId = _$.attr("refer");
+            var deleteData = {
+                md5: currentItemId
+            };
+            if(confirm("DELETE IT, ARE YOU SHURE?") == true) {
+                // delete
                 $.ajax({
-                    url: "/sax/file/share",
+                    url: "/sax/file/delete",
                     method: "POST",
-                    data: JSON.stringify(shareData),
+                    data: JSON.stringify(deleteData),
                     dataType: "json",
                     contentType: "application/json",
                     success: function(result, status, xhr) {
                         var resJson = xhr.responseJSON;
                         if(resJson != null) {
                             if(resJson.status == 200) {  // not login
-                                UIkit.notification({status: 'success', message: 'Share success...'});
-                                $(currentItemId).find("button.uk-modal-close").click();
+                                UIkit.notification({status: 'success', message: 'Delete success...'});
                                 setTimeout(function() {
                                     query();
                                 }, 2000);
                                 return;
                             } else {
-                                UIkit.notification({status: 'warning', message: 'Share failure, reason:' + resJson.msg + '...'});
+                                UIkit.notification({status: 'warning', message: 'Delete failure, reason:' + resJson.msg + '...'});
                                 return;
                             }
                         }
                     },
                     error: function(xhr, status, error) {
-                        UIkit.notification({status: 'warning', message: 'Share failure, reason:' + error + '...'});
+                        UIkit.notification({status: 'warning', message: 'Delete failure, reason:' + error + '...'});
                         return;
-                    }, 
-                    complete: function() {
                     }
                 });
+            } 
+        }
+
+        function share(_this) {
+            var _$ = $(_this.target);
+            var currentItemId = "#"+_$.attr("refer");
+            var shareData = {
+                md5: $(currentItemId).find("input.sax-share-md5").val(),
+                limit:  $(currentItemId).find("input.sax-share-limit").val(),
+                remark:  $(currentItemId).find("textarea.sax-share-remark").val()
+            };
+            if($(currentItemId).find("input.sax-share-md5").val() == null || $(currentItemId).find("input.sax-share-md5").val().length == 0) {
+                UIkit.notification({status: 'warning', message: 'Share file info is empty, please refresh this page...'});
+                return false;
+            }
+            if($(currentItemId).find("textarea.sax-share-remark").val() == null || $(currentItemId).find("textarea.sax-share-remark").val().length == 0) {
+                UIkit.notification({status: 'warning', message: 'Remark cloud not be empty...'});
+                return false;
+            }
+
+            $.ajax({
+                url: "/sax/file/share",
+                method: "POST",
+                data: JSON.stringify(shareData),
+                dataType: "json",
+                contentType: "application/json",
+                success: function(result, status, xhr) {
+                    var resJson = xhr.responseJSON;
+                    if(resJson != null) {
+                        if(resJson.status == 200) {  // not login
+                            UIkit.notification({status: 'success', message: 'Share success...'});
+                            $(currentItemId).find("button.uk-modal-close").click();
+                            setTimeout(function() {
+                                query();
+                            }, 2000);
+                            return;
+                        } else {
+                            UIkit.notification({status: 'warning', message: 'Share failure, reason:' + resJson.msg + '...'});
+                            return;
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    UIkit.notification({status: 'warning', message: 'Share failure, reason:' + error + '...'});
+                    return;
+                }, 
+                complete: function() {
+                }
+            });
         }
 
         function check() {
@@ -334,21 +372,7 @@
             query();
         });
 
-/**
 
-                                    <tr>
-                                        <td>1</td>
-                                        <td>王小二的日志.pdf</td>
-                                        <td>王小二的碎碎念</td>
-                                        <td>2.35MB</td>
-                                        <td>2021-03-13</td>
-                                        <td>
-                                            <a class="uk-button uk-button-default" href="#modal-sections" uk-toggle>SHARE</a>
-                                        </td>
-                                        <td></td>
-                                        <td><button class="uk-button uk-button-default" type="button">Button</button></td>
-                                    </tr>
-*/
 
         function fillQueryResult(_$, list) {
             _$.empty();    // 清空
@@ -420,7 +444,7 @@
                             + '<td>' + formatDate_yyyyMMddhhmmss(current.timestamp) +'</td>'
                             + '<td>' + shareT +'</td>'
                             + '<td>' + '<a class="uk-button uk-button-text" href="' + current.path + '" target="_blank">Download</a>'
-                            //         + '&nbsp;&nbsp;<a href="#" class="uk-button uk-button-text" onclick="delete(' + current.md5 + ');">Delete</a>'
+                                     + '&nbsp;&nbsp;<a href="#" class="uk-button uk-button-text sax-delete-submit" refer="' + current.md5 + '">Delete</a>'
                                 +'</td>'
                             + '<td>' + current.remark +'</td>'
                             + '</tr>';
